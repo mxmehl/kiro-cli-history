@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+"""kiro-cli-history — Search and resume Kiro CLI conversations."""
+
+import os
+import sys
+
+# Allow running from installed location or dev
+script_dir = os.path.dirname(os.path.realpath(__file__))
+parent_dir = os.path.dirname(script_dir)
+sys.path.insert(0, parent_dir)
+
+from kiro_history import main
+
+if __name__ == "__main__":
+    main()
