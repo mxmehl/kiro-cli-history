@@ -1,5 +1,7 @@
 # kiro-cli-history
 
+<video src="https://github.com/prabhugr/kiro-cli-history/raw/main/meta/demo.mp4" width="100%" autoplay loop muted></video>
+
 A terminal UI for fuzzy-searching, browsing, and resuming [Kiro CLI](https://kiro.dev/docs/cli/) conversations.
 
 ## The problem

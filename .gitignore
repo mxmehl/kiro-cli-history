@@ -8,4 +8,4 @@ build/
 .venv/
 .env
 .DS_Store
-demo/demo_data/
+demo/
