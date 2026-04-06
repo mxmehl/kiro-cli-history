@@ -274,19 +274,28 @@ def extract_messages(session, limit=None):
     return messages
 
 
+def _fuzzy_match(query, text):
+    """Fuzzy match: all query tokens must appear in text, in any order.
+    Supports multi-word queries ('mem leak' matches 'Debug memory leak')
+    and tolerates partial words ('depl' matches 'deployment').
+    """
+    text_lower = text.lower()
+    tokens = query.lower().split()
+    return all(token in text_lower for token in tokens)
+
+
 def search_sessions(query, sessions):
-    """Search sessions by title, cwd, and conversation content across all stores."""
+    """Fuzzy-search sessions by title, cwd, and conversation content across all stores."""
     if not query:
         return sessions
 
-    query_lower = query.lower()
     results = []
 
     for session in sessions:
         # Check title and cwd first (fast)
-        title = (session.get("title") or "").lower()
-        cwd = (session.get("cwd") or "").lower()
-        if query_lower in title or query_lower in cwd:
+        title = (session.get("title") or "")
+        cwd = (session.get("cwd") or "")
+        if _fuzzy_match(query, title) or _fuzzy_match(query, cwd):
             results.append(session)
             continue
 
@@ -298,15 +307,25 @@ def search_sessions(query, sessions):
                 user = entry.get("user", {})
                 content = user.get("content", {})
                 if "Prompt" in content:
-                    if query_lower in content["Prompt"].get("prompt", "").lower():
+                    if _fuzzy_match(query, content["Prompt"].get("prompt", "")):
                         found = True
                         break
                 assistant = entry.get("assistant", {})
                 if isinstance(assistant, dict):
                     a_content = assistant.get("content", {})
-                    if "Text" in a_content and query_lower in a_content["Text"].lower():
+                    if "Text" in a_content and _fuzzy_match(query, a_content["Text"]):
                         found = True
                         break
+                    if "Response" in assistant:
+                        resp = assistant["Response"]
+                        if isinstance(resp, dict) and _fuzzy_match(query, resp.get("content", "")):
+                            found = True
+                            break
+                    if "ToolUse" in assistant:
+                        tu = assistant["ToolUse"]
+                        if isinstance(tu, dict) and _fuzzy_match(query, tu.get("content", "")):
+                            found = True
+                            break
             if found:
                 results.append(session)
         elif session.get("jsonl_path"):
@@ -327,7 +346,7 @@ def search_sessions(query, sessions):
                         content = d.get("data", {}).get("content", [])
                         for block in (content if isinstance(content, list) else []):
                             if isinstance(block, dict) and block.get("kind") == "text":
-                                if query_lower in block.get("data", "").lower():
+                                if _fuzzy_match(query, block.get("data", "")):
                                     found = True
                                     break
                         if found:
