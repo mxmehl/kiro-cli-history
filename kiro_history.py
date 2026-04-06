@@ -28,8 +28,10 @@ from rich.markdown import Markdown
 
 # --- Data Layer (read-only) ---
 
-SESSIONS_DIR = Path.home() / ".kiro" / "sessions" / "cli"
-SQLITE_DB = Path.home() / "Library" / "Application Support" / "kiro-cli" / "data.sqlite3"
+# Paths — override with KIRO_DEMO_DIR env var for demo/recording
+_DEMO_DIR = os.environ.get("KIRO_DEMO_DIR", "")
+SESSIONS_DIR = Path(_DEMO_DIR) / "kiro" / "sessions" / "cli" if _DEMO_DIR else Path.home() / ".kiro" / "sessions" / "cli"
+SQLITE_DB = Path(_DEMO_DIR) / "kiro-cli" / "data.sqlite3" if _DEMO_DIR else Path.home() / "Library" / "Application Support" / "kiro-cli" / "data.sqlite3"
 MAX_FILE_SIZE = 100 * 1024 * 1024  # 100MB guard
 
 
