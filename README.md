@@ -27,16 +27,24 @@ This tool **never writes to or modifies** your Kiro CLI session data. It only re
 
 ## Install
 
+Requires [uv](https://docs.astral.sh/uv/).
+
+```bash
+uv tool install git+https://github.com/prabhugr/kiro-cli-history.git
+```
+
+Or from a local clone:
+
 ```bash
 git clone https://github.com/prabhugr/kiro-cli-history.git
 cd kiro-cli-history
-bash install.sh
+uv tool install .
 ```
 
 ### Dependencies
 
-- Python 3.9+
-- [textual](https://github.com/Textualize/textual) (installed automatically by `install.sh`)
+- Python 3.10+
+- [textual](https://github.com/Textualize/textual) (installed automatically via `uv`)
 
 ## Usage
 
@@ -107,7 +115,7 @@ Community PRs for Linux/Windows support are welcome.
 ## Uninstall
 
 ```bash
-bash uninstall.sh
+uv tool uninstall kiro-cli-history
 ```
 
 ## Credits

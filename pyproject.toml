@@ -1,0 +1,81 @@
+[project]
+name = "kiro-cli-history"
+version = "0.1.0"
+description = "A terminal UI for fuzzy-searching, browsing, and resuming Kiro CLI conversations"
+authors = [{ name = "Prabhu G" }]
+requires-python = ">=3.10,<4"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = [
+    "kiro",
+    "kiro-cli",
+    "tui",
+    "history",
+]
+classifiers = [
+    "Environment :: Console",
+    "Topic :: Software Development",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "textual>=0.60.0,<7",
+    "rich>=13.7.0,<15",
+]
+
+[project.urls]
+Repository = "https://github.com/prabhugr/kiro-cli-history"
+
+[project.scripts]
+kiro-cli-history = "kiro_cli_history.main:main"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.10",
+    "ty>=0.0.62",
+    "pytest>=8.0.0,<9",
+]
+
+[tool.uv]
+default-groups = "all"
+
+[tool.uv.build-backend]
+module-name = ["kiro_cli_history"]
+module-root = ""
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[build-system]
+requires = ["uv_build>=0.11.6,<0.12.0"]
+build-backend = "uv_build"
+
+# FORMATTING and LINTING settings
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "T",
+    "FBT",
+    "LOG015",
+    "COM812",
+    "ERA001",
+    "S310",
+    "D205",
+    "D212",
+    "PTH123",
+]
+[tool.ruff.lint.extend-per-file-ignores]
+"tests/*" = ["S101", "PLR", "PT011", "ANN001"]
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+# TY settings
+[tool.ty.src]
+include = ["kiro_cli_history"]
