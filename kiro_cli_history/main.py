@@ -637,7 +637,13 @@ def main() -> None:
         if not kiro_cli:
             print("kiro-cli not found on PATH.")
             return
-        os.execv(kiro_cli, ["kiro-cli", "chat", "--resume"])  # noqa: S606
+        session_id = session.get("session_id", "")
+        args = (
+            ["kiro-cli", "chat", "--resume-id", session_id]
+            if session_id
+            else ["kiro-cli", "chat", "--resume"]
+        )
+        os.execv(kiro_cli, args)  # noqa: S606
 
 
 if __name__ == "__main__":
