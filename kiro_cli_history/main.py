@@ -639,11 +639,11 @@ def main() -> None:
             return
         session_id = session.get("session_id", "")
         args = (
-            ["kiro-cli", "chat", "--resume-id", session_id]
+            [kiro_cli, "chat", "--resume-id", session_id]
             if session_id
-            else ["kiro-cli", "chat", "--resume"]
+            else [kiro_cli, "chat", "--resume"]
         )
-        os.execv(kiro_cli, args)  # noqa: S606
+        subprocess.run(args, check=False)  # noqa: S603
 
 
 if __name__ == "__main__":
