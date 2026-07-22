@@ -7,6 +7,7 @@ Reads from three stores (all read-only, never modifies session data):
   3. ~/Library/.../kiro-cli/data.sqlite3 conversations (v1: SQLite, legacy)
 """
 
+import argparse
 import json
 import os
 import shutil
@@ -23,6 +24,14 @@ from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, Vertical
 from textual.widgets import Footer, Header, Input, ListItem, ListView, RichLog, Static
+
+from kiro_cli_history.config import (
+    DEFAULTS,
+    coerce_value,
+    get_config_path,
+    load_config,
+    save_config,
+)
 
 # --- Data Layer (read-only) ---
 
@@ -452,6 +461,7 @@ class KiroHistory(App):
         self.filtered_sessions: list[dict] = []
         self.selected_session: dict | None = None
         self._viewer_search_query = ""
+        self.config = load_config()
 
     def compose(self) -> ComposeResult:
         """Build the search input, session list, and preview pane layout."""
@@ -461,7 +471,13 @@ class KiroHistory(App):
                 yield Input(placeholder="Search sessions...", id="search-input")
                 yield ListView(id="session-list")
             with Vertical(id="right-pane"):
-                yield RichLog(id="preview", wrap=True, highlight=True, markup=True)
+                yield RichLog(
+                    id="preview",
+                    wrap=True,
+                    highlight=True,
+                    markup=True,
+                    auto_scroll=not self.config["scroll_top"],
+                )
         yield Static("", id="status-bar")
         yield Footer()
 
@@ -562,6 +578,9 @@ class KiroHistory(App):
                 self.call_from_thread(preview.write, Text(txt))
             self.call_from_thread(preview.write, Text(""))
 
+        if self.config["scroll_top"]:
+            self.call_from_thread(preview.scroll_home, animate=False)
+
     # --- Actions ---
 
     def action_resume(self) -> None:
@@ -622,7 +641,7 @@ class KiroHistory(App):
 # --- Entry Point ---
 
 
-def main() -> None:
+def _run_tui() -> None:
     """Run the TUI and, if the user requested it, resume a session afterwards."""
     app = KiroHistory()
     result = app.run()
@@ -644,6 +663,72 @@ def main() -> None:
             else [kiro_cli, "chat", "--resume"]
         )
         subprocess.run(args, check=False)  # noqa: S603
+
+
+def _config_show() -> None:
+    """Print the current config (merged with defaults) and its file path."""
+    print(f"Config file: {get_config_path()}")
+    for key, value in sorted(load_config().items()):
+        print(f"{key} = {json.dumps(value)}")
+
+
+def _config_get(key: str) -> None:
+    """Print the value of a single config key."""
+    config = load_config()
+    if key not in DEFAULTS:
+        print(f"Unknown config key: {key!r}. Known keys: {', '.join(sorted(DEFAULTS))}")
+        raise SystemExit(1)
+    print(json.dumps(config[key]))
+
+
+def _config_set(key: str, raw_value: str) -> None:
+    """Set a single config key to a new value, validating and persisting it."""
+    try:
+        value = coerce_value(key, raw_value)
+    except ValueError as e:
+        print(str(e))
+        raise SystemExit(1) from e
+    config = load_config()
+    config[key] = value
+    save_config(config)
+    print(f"{key} = {json.dumps(value)}")
+
+
+def _build_arg_parser() -> argparse.ArgumentParser:
+    """Build the CLI argument parser."""
+    parser = argparse.ArgumentParser(
+        prog="kiro-cli-history",
+        description="Fuzzy-search, browse, and resume Kiro CLI conversations.",
+    )
+    subparsers = parser.add_subparsers(dest="command")
+
+    config_parser = subparsers.add_parser("config", help="View or change user configuration")
+    config_subparsers = config_parser.add_subparsers(dest="config_command", required=True)
+    config_subparsers.add_parser("show", help="Show the current configuration")
+    get_parser = config_subparsers.add_parser("get", help="Get a single config value")
+    get_parser.add_argument("key", help="Config key, e.g. 'scroll_top'")
+    set_parser = config_subparsers.add_parser("set", help="Set a single config value")
+    set_parser.add_argument("key", help="Config key, e.g. 'scroll_top'")
+    set_parser.add_argument("value", help="New value, e.g. 'true'")
+
+    return parser
+
+
+def main() -> None:
+    """Parse CLI arguments and dispatch to the config subcommand or the TUI."""
+    parser = _build_arg_parser()
+    args = parser.parse_args()
+
+    if args.command == "config":
+        if args.config_command == "show":
+            _config_show()
+        elif args.config_command == "get":
+            _config_get(args.key)
+        elif args.config_command == "set":
+            _config_set(args.key, args.value)
+        return
+
+    _run_tui()
 
 
 if __name__ == "__main__":

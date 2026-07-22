@@ -79,6 +79,24 @@ Search is case-insensitive and covers all session formats.
 
 Hold **Option (Alt)** while dragging to select text from the preview pane. Or press **Ctrl+Y** to copy the full conversation to clipboard.
 
+### Configuration
+
+Settings are stored in a JSON file managed via the `config` subcommand — no need to edit it by hand.
+
+```bash
+kiro-cli-history config show          # print all settings and the config file path
+kiro-cli-history config get scroll_top
+kiro-cli-history config set scroll_top true
+```
+
+Available settings:
+
+| Key | Default | Description |
+|-----|---------|--------------|
+| `scroll_top` | `false` | Show the start of a conversation in the preview pane instead of jumping to the most recent messages |
+
+The config file lives at the platform's standard config location (e.g. `~/Library/Application Support/kiro-cli-history/config.json` on macOS).
+
 ## How it works
 
 Kiro CLI stores conversations in three formats depending on the version and mode:
