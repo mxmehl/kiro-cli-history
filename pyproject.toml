@@ -25,6 +25,7 @@ classifiers = [
 dependencies = [
     "textual>=0.60.0,<7",
     "rich>=13.7.0,<15",
+    "platformdirs>=4.0.0,<5",
 ]
 
 [project.urls]

@@ -37,6 +37,7 @@ name = "kiro-cli-history"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "platformdirs" },
     { name = "rich" },
     { name = "textual" },
 ]
@@ -50,6 +51,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "platformdirs", specifier = ">=4.0.0,<5" },
     { name = "rich", specifier = ">=13.7.0,<15" },
     { name = "textual", specifier = ">=0.60.0,<7" },
 ]
