@@ -1,6 +1,7 @@
 """Smoke tests for the core, dependency-free data logic."""
 
 from kiro_cli_history.main import (
+    _extract_credits_used,
     _extract_messages_from_history,
     _fuzzy_match,
     _get_first_prompt_from_history,
@@ -54,3 +55,70 @@ def test_search_sessions_matches_title_and_content() -> None:
     assert search_sessions("deployment", sessions) == [sessions[0]]
     assert search_sessions("memory leak", sessions) == [sessions[1]]
     assert search_sessions("", sessions) == sessions
+
+
+def test_extract_credits_used_sums_multiple_turns() -> None:
+    """Credits are summed across all turns and all metering_usage entries per turn."""
+    meta = {
+        "session_state": {
+            "conversation_metadata": {
+                "user_turn_metadatas": [
+                    {
+                        "metering_usage": [
+                            {"value": 0.1, "unit": "credit"},
+                            {"value": 0.2, "unit": "credit"},
+                        ]
+                    },
+                    {"metering_usage": [{"value": 0.3, "unit": "credit"}]},
+                ]
+            }
+        }
+    }
+    assert _extract_credits_used(meta) == 0.6000000000000001
+
+
+def test_extract_credits_used_missing_turns_returns_none() -> None:
+    """No user_turn_metadatas (missing or empty) means no usage data at all."""
+    assert _extract_credits_used({}) is None
+    assert _extract_credits_used({"session_state": {}}) is None
+    assert (
+        _extract_credits_used(
+            {"session_state": {"conversation_metadata": {"user_turn_metadatas": []}}}
+        )
+        is None
+    )
+
+
+def test_extract_credits_used_ignores_non_credit_units() -> None:
+    """Only entries with unit == 'credit' are summed; other units are ignored."""
+    meta = {
+        "session_state": {
+            "conversation_metadata": {
+                "user_turn_metadatas": [
+                    {
+                        "metering_usage": [
+                            {"value": 5.0, "unit": "token"},
+                            {"value": 0.5, "unit": "credit"},
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+    assert _extract_credits_used(meta) == 0.5
+
+
+def test_extract_credits_used_handles_empty_or_missing_metering_usage() -> None:
+    """Turns with an empty or absent metering_usage list don't break summation."""
+    meta = {
+        "session_state": {
+            "conversation_metadata": {
+                "user_turn_metadatas": [
+                    {"metering_usage": []},
+                    {},
+                    {"metering_usage": [{"value": 1.0, "unit": "credit"}]},
+                ]
+            }
+        }
+    }
+    assert _extract_credits_used(meta) == 1.0

@@ -113,6 +113,7 @@ Kiro CLI stores conversations in three formats depending on the version and mode
 - **Date** — last activity (e.g., "7 Apr 2026")
 - **Message count** — total exchanges
 - **Duration** — elapsed time
+- **Credit usage** — total credits spent on the session (JSONL/v3 sessions only — older SQLite sessions don't record this)
 
 ## How this complements Kiro CLI
 
