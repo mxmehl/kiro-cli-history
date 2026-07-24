@@ -142,6 +142,7 @@ def _parse_v2_row(
         "msg_count": len(history),
         "duration_min": int((updated_ms - created_ms) / 1000 / 60),
         "_history": history,
+        "credits_used": None,
     }
 
 
@@ -162,6 +163,7 @@ def _parse_v1_row(cwd: str, value: str) -> dict | None:
         "msg_count": len(history),
         "duration_min": 0,
         "_history": history,
+        "credits_used": None,
     }
 
 
@@ -229,6 +231,26 @@ def _compute_duration_min(created: str, updated: str) -> int:
     return int((u - c).total_seconds() / 60)
 
 
+def _extract_credits_used(meta: dict) -> float | None:
+    """Sum metering_usage credit values across all turns in a v3 session's metadata.
+
+    Returns None if the session has no usage metadata at all (rather than 0.0),
+    so callers can distinguish "no data" from "genuinely free".
+    """
+    turns = meta.get("session_state", {}).get("conversation_metadata", {})
+    turns = turns.get("user_turn_metadatas", [])
+    if not turns:
+        return None
+    total = 0.0
+    found = False
+    for turn in turns:
+        for usage in turn.get("metering_usage") or []:
+            if usage.get("unit") == "credit":
+                total += usage.get("value", 0.0)
+                found = True
+    return total if found else None
+
+
 def _load_one_jsonl_session(json_file: Path) -> dict | None:
     """Load a single v3 session from its .json metadata file, or None if invalid."""
     if json_file.stat().st_size > MAX_FILE_SIZE:
@@ -252,6 +274,7 @@ def _load_one_jsonl_session(json_file: Path) -> dict | None:
         "msg_count": _count_jsonl_messages(jsonl_path),
         "duration_min": _compute_duration_min(created, updated),
         "jsonl_path": str(jsonl_path),
+        "credits_used": _extract_credits_used(meta),
     }
 
 
@@ -388,10 +411,14 @@ class SessionItem(ListItem):
         cwd = Path(self.session.get("cwd") or "").name
         msgs = self.session.get("msg_count", 0)
         dur_str = _format_duration(self.session.get("duration_min", 0))
+        credits_used = self.session.get("credits_used")
+        credits_str = (
+            f"  [dim yellow]{credits_used:.2f} cr[/dim yellow]" if credits_used is not None else ""
+        )
         yield Static(
             f"[bold]{title}[/bold]\n"
             f"[dim]{cwd}[/dim]  [dim italic]{ts}[/dim italic]  "
-            f"[dim cyan]{msgs} msgs[/dim cyan]  [dim green]{dur_str}[/dim green]",
+            f"[dim cyan]{msgs} msgs[/dim cyan]  [dim green]{dur_str}[/dim green]{credits_str}",
             markup=True,
         )
 
@@ -539,6 +566,8 @@ class KiroHistory(App):
         updated = (session.get("updated_at") or "")[:19].replace("T", " ")
         msgs = session.get("msg_count", 0)
         dur_str = _format_duration(session.get("duration_min", 0))
+        credits_used = session.get("credits_used")
+        credits_str = f"{credits_used:.2f}" if credits_used is not None else "N/A"
 
         header = (
             f"[bold]SESSION:[/bold] {title}\n"
@@ -546,6 +575,7 @@ class KiroHistory(App):
             f"[bold]CREATED:[/bold] {created}\n"
             f"[bold]UPDATED:[/bold] {updated}\n"
             f"[bold]MESSAGES:[/bold] {msgs}\n"
+            f"[bold]CREDITS:[/bold] {credits_str}\n"
             f"[bold]DURATION:[/bold] {dur_str}\n"
             f"[bold]ID:[/bold] {session.get('session_id', '')}\n"
         )
