@@ -26,7 +26,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "textual>=0.60.0,<7",
+    "textual>=8.2.8,<9",
     "rich>=15,<16",
     "platformdirs>=4.0.0,<5",
 ]
