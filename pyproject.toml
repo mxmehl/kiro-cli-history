@@ -77,6 +77,7 @@ ignore = [
     "D212",
     "PTH123",
     "CPY001",
+    "CPY",
 ]
 [tool.ruff.lint.extend-per-file-ignores]
 "tests/*" = ["S101", "PLR", "PT011", "ANN001"]
