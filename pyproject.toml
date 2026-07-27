@@ -42,7 +42,7 @@ kiro-cli-history = "kiro_cli_history.main:main"
 dev = [
     "ruff>=0.15.10",
     "ty>=0.0.62",
-    "pytest>=8.0.0,<9",
+    "pytest>=9.1.1,<10",
     "reuse[charset-normalizer]>=6.2.0",
 ]
 
