@@ -29,7 +29,7 @@ Kiro CLI has great built-in [conversation persistence](https://kiro.dev/docs/cli
 
 This tool **never writes to or modifies** your Kiro CLI session data. It only reads from:
 - `~/.kiro/sessions/cli/` (JSONL sessions)
-- `~/Library/Application Support/kiro-cli/data.sqlite3` (SQLite sessions, opened in read-only mode)
+- The Kiro CLI SQLite database (`data.sqlite3`), opened in read-only mode — located at `~/Library/Application Support/kiro-cli/` on macOS, `~/.local/share/kiro-cli/` on Linux, or `%APPDATA%\kiro-cli\` on Windows
 
 ## Install
 
@@ -111,7 +111,7 @@ Kiro CLI stores conversations in three formats depending on the version and mode
 | Format | Location | Used by |
 |--------|----------|---------|
 | v3 (JSONL) | `~/.kiro/sessions/cli/*.json` + `*.jsonl` | `kiro-cli --classic` |
-| v2 (SQLite) | `~/Library/Application Support/kiro-cli/data.sqlite3` | New TUI mode (`kiro-cli`) |
+| v2 (SQLite) | Platform data dir (`~/Library/Application Support/kiro-cli/` on macOS, `~/.local/share/kiro-cli/` on Linux, `%APPDATA%\kiro-cli\` on Windows), `data.sqlite3` | New TUI mode (`kiro-cli`) |
 | v1 (SQLite) | Same database, `conversations` table | Legacy |
 
 `kiro-cli-history` reads all three and presents them in a unified view. Each session shows:
@@ -134,9 +134,11 @@ Kiro CLI's native `--resume` and `--resume-picker` work well when you know which
 
 ## Platform
 
-Currently mainly macOS (uses `pbcopy` for clipboard, macOS-specific paths).
+Session discovery and clipboard support now work across macOS, Linux, and Windows:
+- **Session storage** — resolved via the same platform-specific data directory convention Kiro CLI itself uses (`~/Library/Application Support/`, `~/.local/share/`, or `%APPDATA%`)
+- **Clipboard** — tries `pbcopy` (macOS), `clip` (Windows), then `wl-copy`, `xclip`, or `xsel` (Linux, Wayland/X11)
 
-Community PRs for Linux/Windows support are welcome.
+This has been tested on macOS. Linux and Windows support is implemented but not yet verified in practice — bug reports and PRs are welcome if something doesn't work as expected.
 
 ## Contributing
 

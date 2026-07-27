@@ -3,8 +3,11 @@
 A terminal UI for searching, browsing, and resuming Kiro CLI sessions.
 Reads from three stores (all read-only, never modifies session data):
   1. ~/.kiro/sessions/cli/*.json+jsonl (v3: JSONL format, used by --classic mode)
-  2. ~/Library/.../kiro-cli/data.sqlite3 conversations_v2 (v2: SQLite, new TUI mode)
-  3. ~/Library/.../kiro-cli/data.sqlite3 conversations (v1: SQLite, legacy)
+  2. <platform data dir>/kiro-cli/data.sqlite3 conversations_v2 (v2: SQLite, new TUI mode)
+  3. <platform data dir>/kiro-cli/data.sqlite3 conversations (v1: SQLite, legacy)
+
+The SQLite data dir follows Kiro CLI's own convention: `~/Library/Application Support/kiro-cli`
+on macOS, `~/.local/share/kiro-cli` on Linux, `%APPDATA%/kiro-cli` on Windows.
 """
 
 # SPDX-License-Identifier: MIT
@@ -21,6 +24,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import ClassVar
 
+from platformdirs import user_data_dir
 from rich.markdown import Markdown
 from rich.text import Text
 from textual import on, work
@@ -50,7 +54,7 @@ SESSIONS_DIR = (
 SQLITE_DB = (
     Path(_DEMO_DIR) / "kiro-cli" / "data.sqlite3"
     if _DEMO_DIR
-    else Path.home() / "Library" / "Application Support" / "kiro-cli" / "data.sqlite3"
+    else Path(user_data_dir("kiro-cli", appauthor=False)) / "data.sqlite3"
 )
 MAX_FILE_SIZE = 100 * 1024 * 1024  # 100MB guard
 _MINUTES_PER_HOUR = 60
@@ -428,6 +432,30 @@ class SessionItem(ListItem):
         )
 
 
+def _copy_to_clipboard(text: str) -> bool:
+    """Copy text to the system clipboard using the first available platform tool.
+
+    Tries pbcopy (macOS), then clip (Windows), then xclip/xsel (X11) or wl-copy
+    (Wayland) on Linux. Returns True on success, False if no tool was found.
+    """
+    # ponytail: one command per platform/display-server; no clipboard library
+    # dependency since terminal clipboard access is inherently tool-shelling.
+    candidates: list[list[str]] = [
+        ["pbcopy"],
+        ["clip"],
+        ["wl-copy"],
+        ["xclip", "-selection", "clipboard"],
+        ["xsel", "--clipboard", "--input"],
+    ]
+    for cmd in candidates:
+        tool = shutil.which(cmd[0])
+        if not tool:
+            continue
+        subprocess.run([tool, *cmd[1:]], input=text.encode("utf-8"), check=True)  # noqa: S603
+        return True
+    return False
+
+
 class KiroHistory(App):
     """Kiro CLI session browser and search."""
 
@@ -665,11 +693,12 @@ class KiroHistory(App):
         for msg in messages:
             label = "[YOU]" if msg["role"] == "you" else "[KIRO]"
             text += f"{label}:\n{msg['text']}\n\n"
-        pbcopy = shutil.which("pbcopy")
-        if not pbcopy:
-            self.notify("pbcopy not found (macOS only)", severity="error")
+        if not _copy_to_clipboard(text):
+            self.notify(
+                "No clipboard tool found (tried pbcopy, clip, wl-copy, xclip, xsel)",
+                severity="error",
+            )
             return
-        subprocess.run([pbcopy], input=text.encode("utf-8"), check=True)  # noqa: S603
         self.notify(f"Copied {len(messages)} messages to clipboard")
 
 
