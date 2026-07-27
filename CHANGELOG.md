@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/mxmehl/kiro-cli-history/compare/v0.2.1...v0.3.0) (2026-07-27)
+
+
+### 🚀 New Features
+
+* support Linux and Windows regarding data directories and clipboard copy apps ([#16](https://github.com/mxmehl/kiro-cli-history/issues/16)) ([1c79ae9](https://github.com/mxmehl/kiro-cli-history/commit/1c79ae95b4644e1fe78ee485f83dc856a4852653))
+
 ## [0.2.1](https://github.com/mxmehl/kiro-cli-history/compare/v0.2.0...v0.2.1) (2026-07-27)
 
 
