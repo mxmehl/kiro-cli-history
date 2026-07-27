@@ -3,7 +3,11 @@
 # SPDX-License-Identifier: MIT
 # SPDX-FileCopyrightText: 2026 Max Mehl <https://mehl.mx>
 
+import pytest
+
+from kiro_cli_history import main as main_module
 from kiro_cli_history.main import (
+    _copy_to_clipboard,
     _extract_credits_used,
     _extract_messages_from_history,
     _fuzzy_match,
@@ -125,3 +129,28 @@ def test_extract_credits_used_handles_empty_or_missing_metering_usage() -> None:
         }
     }
     assert _extract_credits_used(meta) == 1.0
+
+
+def test_copy_to_clipboard_uses_first_available_tool(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The first available clipboard tool in the priority list is used."""
+    calls = []
+
+    def fake_which(name: str) -> str | None:
+        return f"/usr/bin/{name}" if name == "wl-copy" else None
+
+    def fake_run(cmd: list[str], input: bytes, check: bool) -> None:  # noqa: A002
+        calls.append((cmd, input, check))
+
+    monkeypatch.setattr(main_module.shutil, "which", fake_which)
+    monkeypatch.setattr(main_module.subprocess, "run", fake_run)
+
+    assert _copy_to_clipboard("hello") is True
+    assert calls == [(["/usr/bin/wl-copy"], b"hello", True)]
+
+
+def test_copy_to_clipboard_returns_false_when_no_tool_found(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """No clipboard tool on PATH means the function reports failure, not an exception."""
+    monkeypatch.setattr(main_module.shutil, "which", lambda _name: None)
+    assert _copy_to_clipboard("hello") is False
