@@ -1,5 +1,8 @@
 """User configuration: a small JSON file under the platform's config directory."""
 
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: 2026 Max Mehl <https://mehl.mx>
+
 import json
 from pathlib import Path
 

@@ -7,6 +7,10 @@ Reads from three stores (all read-only, never modifies session data):
   3. ~/Library/.../kiro-cli/data.sqlite3 conversations (v1: SQLite, legacy)
 """
 
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: 2026 Prabhu G <gangprab@amazon.com>
+# SPDX-FileCopyrightText: 2026 Max Mehl <https://mehl.mx>
+
 import argparse
 import json
 import os
@@ -25,6 +29,7 @@ from textual.binding import Binding
 from textual.containers import Horizontal, Vertical
 from textual.widgets import Footer, Header, Input, ListItem, ListView, RichLog, Static
 
+import kiro_cli_history
 from kiro_cli_history.config import (
     DEFAULTS,
     coerce_value,
@@ -729,6 +734,9 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="kiro-cli-history",
         description="Fuzzy-search, browse, and resume Kiro CLI conversations.",
+    )
+    parser.add_argument(
+        "--version", action="version", version=f"%(prog)s {kiro_cli_history.__version__}"
     )
     subparsers = parser.add_subparsers(dest="command")
 

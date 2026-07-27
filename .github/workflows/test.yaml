@@ -1,0 +1,119 @@
+# SPDX-FileCopyrightText: 2026 Max Mehl <https://mehl.mx>
+# SPDX-License-Identifier: CC0-1.0
+
+name: Test suites
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  # Test using the tool via uv on different OSes and python versions
+  test-os-python-matrix:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      max-parallel: 10
+      # do not abort the whole test job if one combination in the matrix fails
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        os: [ubuntu-24.04]
+        include:
+          - python-version: "3.10"
+            os: macos-latest
+          - python-version: "3.10"
+            os: windows-latest
+
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/uvbuild
+        with:
+          python: ${{ matrix.python-version }}
+          uv_args: --no-dev
+      - name: Execute kiro-cli-history
+        run: |
+          uv run kiro-cli-history --version
+          uv run kiro-cli-history --help
+          uv run kiro-cli-history config show
+
+  # Test building the package and installing it via pip3
+  test-build-install:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.14"
+      - name: Install uv
+        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+        with:
+          enable-cache: true
+      - name: Build package
+        run: uv build
+      - name: Install package
+        run: pip3 install dist/kiro_cli_history-*.tar.gz
+      - name: Run package
+        run: |
+          kiro-cli-history --version
+          kiro-cli-history --help
+
+  pytest:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/uvbuild
+      - name: Test with pytest
+        run: uv run pytest
+
+  # Quality checks
+  ruff-lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/uvbuild
+      - name: Lint with ruff
+        run: uv run ruff check
+
+  ruff-format:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/uvbuild
+      - name: Check formatting with ruff
+        run: uv run ruff format --check
+
+  ty:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/uvbuild
+      - name: Test typing with ty
+        run: uv run ty check
+
+  # REUSE
+  reuse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - name: Check REUSE Compliance
+        uses: fsfe/reuse-action@676e2d560c9a403aa252096d99fcab3e1132b0f5 # v6.0.0

@@ -1,5 +1,8 @@
 """Tests for the JSON user config module."""
 
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: 2026 Max Mehl <https://mehl.mx>
+
 import json
 from pathlib import Path
 

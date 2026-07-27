@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: CC0-1.0
+# SPDX-FileCopyrightText: 2026 Max Mehl <https://mehl.mx>
+
 [project]
 name = "kiro-cli-history"
 version = "0.1.0"
@@ -6,7 +9,7 @@ authors = [{ name = "Prabhu G" }]
 requires-python = ">=3.10,<4"
 readme = "README.md"
 license = "MIT"
-license-files = ["LICENSE"]
+license-files = ["LICENSE", "LICENSES/*"]
 keywords = [
     "kiro",
     "kiro-cli",
@@ -29,7 +32,8 @@ dependencies = [
 ]
 
 [project.urls]
-Repository = "https://github.com/prabhugr/kiro-cli-history"
+Repository = "https://github.com/mxmehl/kiro-cli-history"
+Changelog = "https://github.com/mxmehl/kiro-cli-history/blob/main/CHANGELOG.md"
 
 [project.scripts]
 kiro-cli-history = "kiro_cli_history.main:main"
@@ -39,6 +43,7 @@ dev = [
     "ruff>=0.15.10",
     "ty>=0.0.62",
     "pytest>=8.0.0,<9",
+    "reuse[charset-normalizer]>=6.2.0",
 ]
 
 [tool.uv]

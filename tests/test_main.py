@@ -1,5 +1,8 @@
 """Smoke tests for the core, dependency-free data logic."""
 
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: 2026 Max Mehl <https://mehl.mx>
+
 from kiro_cli_history.main import (
     _extract_credits_used,
     _extract_messages_from_history,
