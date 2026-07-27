@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.2.1](https://github.com/mxmehl/kiro-cli-history/compare/v0.2.0...v0.2.1) (2026-07-27)
+
+
+### 🔥 Bug Fixes
+
+* **deps:** update dependency rich to v15 ([#13](https://github.com/mxmehl/kiro-cli-history/issues/13)) ([6e6b32e](https://github.com/mxmehl/kiro-cli-history/commit/6e6b32e50236888d80e0155ebad3328257812f54))
+* **deps:** update dependency textual to v8 ([#14](https://github.com/mxmehl/kiro-cli-history/issues/14)) ([666ac10](https://github.com/mxmehl/kiro-cli-history/commit/666ac1016aba376d43eb0723a4e4fa731872ed77))
+
+
+### ⚙️ Chores
+
+* **deps:** lock file maintenance ([#15](https://github.com/mxmehl/kiro-cli-history/issues/15)) ([98ba7d4](https://github.com/mxmehl/kiro-cli-history/commit/98ba7d4e071aa79bd46662b8f19619faf89a2d9d))
+* **deps:** update dependency pytest to v9 ([#9](https://github.com/mxmehl/kiro-cli-history/issues/9)) ([af49ea9](https://github.com/mxmehl/kiro-cli-history/commit/af49ea96af32c73a082d3ed82e3cead0e67f71a9))
+* **deps:** update github actions group ([#8](https://github.com/mxmehl/kiro-cli-history/issues/8)) ([721c95a](https://github.com/mxmehl/kiro-cli-history/commit/721c95a4c91c04700e3c75d1219c29027485dfac))
+* **deps:** update github actions group (major) ([#12](https://github.com/mxmehl/kiro-cli-history/issues/12)) ([9a48a34](https://github.com/mxmehl/kiro-cli-history/commit/9a48a3411152025d7201da46d35e1f371e4ac519))
+
 ## [0.2.0](https://github.com/mxmehl/kiro-cli-history/compare/v0.1.0...v0.2.0) (2026-07-27)
 
 
