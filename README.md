@@ -1,3 +1,9 @@
+<!--
+SPDX-License-Identifier: MIT
+SPDX-FileCopyrightText: 2026 Prabhu G <gangprab@amazon.com>
+SPDX-FileCopyrightText: 2026 Max Mehl <https://mehl.mx>
+-->
+
 # kiro-cli-history
 
 ![kiro-cli-history demo](/meta/demo.gif)
@@ -27,24 +33,25 @@ This tool **never writes to or modifies** your Kiro CLI session data. It only re
 
 ## Install
 
-Requires [uv](https://docs.astral.sh/uv/).
+Requires at least Python 3.10.
+
+With [pipx](https://pipx.pypa.io/):
 
 ```bash
-uv tool install git+https://github.com/prabhugr/kiro-cli-history.git
+pipx install kiro-cli-history
 ```
 
-Or from a local clone:
+With [uv](https://docs.astral.sh/uv/):
 
 ```bash
-git clone https://github.com/prabhugr/kiro-cli-history.git
-cd kiro-cli-history
-uv tool install .
+uv tool install kiro-cli-history
 ```
 
-### Dependencies
+With pip:
 
-- Python 3.10+
-- [textual](https://github.com/Textualize/textual) (installed automatically via `uv`)
+```bash
+pip3 install kiro-cli-history
+```
 
 ## Usage
 
@@ -127,19 +134,19 @@ Kiro CLI's native `--resume` and `--resume-picker` work well when you know which
 
 ## Platform
 
-macOS (uses `pbcopy` for clipboard, macOS-specific paths).
+Currently mainly macOS (uses `pbcopy` for clipboard, macOS-specific paths).
 
 Community PRs for Linux/Windows support are welcome.
 
-## Uninstall
+## Contributing
 
-```bash
-uv tool uninstall kiro-cli-history
-```
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for the development setup and quality checks. Commits to the default branch follow [Conventional Commits](https://www.conventionalcommits.org/), and releases are automated with [release-please](https://github.com/googleapis/release-please) — see [CHANGELOG.md](CHANGELOG.md) for the release history.
 
 ## Credits
 
 Inspired by [raine/claude-history](https://github.com/raine/claude-history) — an excellent fuzzy-search tool for Claude Code conversations. If you use Claude Code, check that out.
+
+Forked from [prabhu-g/kiro-cli-history](https://github.com/prabhugr/kiro-cli-history) — thanks to Prabhu for the initial implementation!
 
 ## License
 
