@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/mxmehl/kiro-cli-history/compare/v0.3.0...v0.3.1) (2026-07-27)
+
+
+### ⚙️ Chores
+
+* disable unnecessary ruff check ([#18](https://github.com/mxmehl/kiro-cli-history/issues/18)) ([18c6bd1](https://github.com/mxmehl/kiro-cli-history/commit/18c6bd16a641dfdf8b7d5a74df53955ad41836b6))
+
 ## [0.3.0](https://github.com/mxmehl/kiro-cli-history/compare/v0.2.1...v0.3.0) (2026-07-27)
 
 
