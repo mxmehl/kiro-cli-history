@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.2](https://github.com/mxmehl/kiro-cli-history/compare/v0.3.1...v0.3.2) (2026-08-10)
+
+
+### ⚙️ Chores
+
+* **deps:** lock file maintenance ([#23](https://github.com/mxmehl/kiro-cli-history/issues/23)) ([0cb3d43](https://github.com/mxmehl/kiro-cli-history/commit/0cb3d43e69f58a3053e2717c72d86e4e20c84622))
+* **deps:** lock file maintenance ([#26](https://github.com/mxmehl/kiro-cli-history/issues/26)) ([31cfb8d](https://github.com/mxmehl/kiro-cli-history/commit/31cfb8dea632b07dbb411b3d2ee9f128dcd36e10))
+* **deps:** update dependency uv_build to &gt;=0.12.0,&lt;0.13.0 ([#20](https://github.com/mxmehl/kiro-cli-history/issues/20)) ([dc20cce](https://github.com/mxmehl/kiro-cli-history/commit/dc20cce09012931573153fccc614b1661952f786))
+* **deps:** update mxmehl/latest-release-vulnerability-status action to v1.3.0 ([#24](https://github.com/mxmehl/kiro-cli-history/issues/24)) ([d34d934](https://github.com/mxmehl/kiro-cli-history/commit/d34d934a9f8b85e57580398fc3243fb3a2e9992c))
+* **deps:** update pypa/gh-action-pypi-publish action to v1.14.2 ([#22](https://github.com/mxmehl/kiro-cli-history/issues/22)) ([3d35cf5](https://github.com/mxmehl/kiro-cli-history/commit/3d35cf5bcb0e5cd19d65c6fcb78ba71c87e39f82))
+* **deps:** update zizmorcore/zizmor-action action to v0.6.2 ([#25](https://github.com/mxmehl/kiro-cli-history/issues/25)) ([1911896](https://github.com/mxmehl/kiro-cli-history/commit/1911896ab85e6b4e655f1b36668aa58d7fc7d3fe))
+
 ## [0.3.1](https://github.com/mxmehl/kiro-cli-history/compare/v0.3.0...v0.3.1) (2026-07-27)
 
 

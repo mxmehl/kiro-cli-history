@@ -3,7 +3,7 @@
 
 [project]
 name = "kiro-cli-history"
-version = "0.3.1"
+version = "0.3.2"
 description = "A terminal UI for fuzzy-searching, browsing, and resuming Kiro CLI conversations"
 authors = [{ name = "Prabhu G" }]
 requires-python = ">=3.10,<4"
