@@ -23,12 +23,13 @@ Kiro CLI has great built-in [conversation persistence](https://kiro.dev/docs/cli
 - **Conversation preview** — read through the full exchange with markdown rendering before deciding to resume
 - **One-key resume** — press `Ctrl+R` to jump into Kiro CLI and continue the conversation
 - **Copy to clipboard** — press `Ctrl+Y` to copy an entire conversation
-- **All session formats** — reads all three Kiro CLI storage versions (v1 SQLite, v2 SQLite, v3 JSONL), covering both `--classic` and new TUI modes
+- **All session formats** — reads all four Kiro CLI storage versions (CLI 1.x SQLite, CLI 2.x SQLite, CLI 2.x classic-mode JSONL, CLI 3.0), covering both `--classic` and TUI modes across versions
 
 ## Read-only
 
 This tool **never writes to or modifies** your Kiro CLI session data. It only reads from:
-- `~/.kiro/sessions/cli/` (JSONL sessions)
+- `~/.kiro/sessions/<workspace-hash>/sess_*/` (CLI 3.0 sessions)
+- `~/.kiro/sessions/cli/` (CLI 2.x classic-mode JSONL sessions)
 - The Kiro CLI SQLite database (`data.sqlite3`), opened in read-only mode — located at `~/Library/Application Support/kiro-cli/` on macOS, `~/.local/share/kiro-cli/` on Linux, or `%APPDATA%\kiro-cli\` on Windows
 
 ## Install
@@ -106,21 +107,22 @@ The config file lives at the platform's standard config location (e.g. `~/Librar
 
 ## How it works
 
-Kiro CLI stores conversations in three formats depending on the version and mode:
+Kiro CLI stores conversations in four formats depending on the version and mode:
 
 | Format | Location | Used by |
 |--------|----------|---------|
-| v3 (JSONL) | `~/.kiro/sessions/cli/*.json` + `*.jsonl` | `kiro-cli --classic` |
-| v2 (SQLite) | Platform data dir (`~/Library/Application Support/kiro-cli/` on macOS, `~/.local/share/kiro-cli/` on Linux, `%APPDATA%\kiro-cli\` on Windows), `data.sqlite3` | New TUI mode (`kiro-cli`) |
-| v1 (SQLite) | Same database, `conversations` table | Legacy |
+| CLI 3.0 | `~/.kiro/sessions/<workspace-hash>/sess_*/session.json` + `messages.jsonl` | `kiro-cli --v3` |
+| CLI 2.x (classic JSONL) | `~/.kiro/sessions/cli/*.json` + `*.jsonl` | `kiro-cli --classic` (2.x) |
+| CLI 2.x (SQLite) | Platform data dir (`~/Library/Application Support/kiro-cli/` on macOS, `~/.local/share/kiro-cli/` on Linux, `%APPDATA%\kiro-cli\` on Windows), `data.sqlite3`, `conversations_v2` table | TUI mode (2.x) |
+| CLI 1.x (SQLite) | Same database, `conversations` table | Legacy |
 
-`kiro-cli-history` reads all three and presents them in a unified view. Each session shows:
+`kiro-cli-history` reads all four and presents them in a unified view. Each session shows:
 - **Title** — first message or auto-generated title
 - **Directory** — where the session was started
 - **Date** — last activity (e.g., "7 Apr 2026")
 - **Message count** — total exchanges
 - **Duration** — elapsed time
-- **Credit usage** — total credits spent on the session (JSONL/v3 sessions only — older SQLite sessions don't record this)
+- **Credit usage** — total credits spent on the session (CLI 2.x and CLI 3.0 sessions only — SQLite sessions don't record this)
 
 ## How this complements Kiro CLI
 

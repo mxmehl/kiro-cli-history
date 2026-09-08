@@ -3,6 +3,9 @@
 # SPDX-License-Identifier: MIT
 # SPDX-FileCopyrightText: 2026 Max Mehl <https://mehl.mx>
 
+import json
+from pathlib import Path
+
 import pytest
 
 from kiro_cli_history import main as main_module
@@ -12,6 +15,8 @@ from kiro_cli_history.main import (
     _extract_messages_from_history,
     _fuzzy_match,
     _get_first_prompt_from_history,
+    _load_one_v3_session,
+    extract_messages,
     search_sessions,
 )
 
@@ -154,3 +159,93 @@ def test_copy_to_clipboard_returns_false_when_no_tool_found(
     """No clipboard tool on PATH means the function reports failure, not an exception."""
     monkeypatch.setattr(main_module.shutil, "which", lambda _name: None)
     assert _copy_to_clipboard("hello") is False
+
+
+def _write_v3_session(
+    tmp_path: Path, session_id: str = "sess_abc123", cwd: str = "/repo/a"
+) -> Path:
+    """Create a fixture CLI 3.0 session.json + messages.jsonl on disk and return the dir."""
+    session_dir = tmp_path / "workspacehash" / session_id
+    session_dir.mkdir(parents=True)
+    (session_dir / "session.json").write_text(
+        json.dumps(
+            {
+                "id": session_id,
+                "title": "Fix the deploy pipeline",
+                "workspacePaths": [cwd],
+                "createdAt": "2026-09-08T13:19:33.360Z",
+                "lastModifiedAt": "2026-09-08T13:42:47.816Z",
+            }
+        )
+    )
+    lines = [
+        {"payload": {"type": "tool_call", "toolName": "fetch_cloud_config"}},
+        {"payload": {"type": "user", "content": "hello there"}},
+        {"payload": {"type": "assistant", "content": "hi, how can I help?"}},
+        {
+            "payload": {
+                "type": "usage_summary",
+                "promptTurnSummaries": [{"unit": "credit", "usage": 1.5}],
+            }
+        },
+    ]
+    (session_dir / "messages.jsonl").write_text(
+        "\n".join(json.dumps(line) for line in lines) + "\n"
+    )
+    return session_dir
+
+
+def test_load_one_v3_session_maps_fields(tmp_path: Path) -> None:
+    """A CLI 3.0 session.json is mapped to the common session dict shape."""
+    session_dir = _write_v3_session(tmp_path, session_id="sess_abc123", cwd="/repo/a")
+    session = _load_one_v3_session(session_dir / "session.json")
+    assert session is not None
+    assert session["session_id"] == "sess_abc123"
+    assert session["title"] == "Fix the deploy pipeline"
+    assert session["cwd"] == "/repo/a"
+    assert session["created_at"] == "2026-09-08T13:19:33.360Z"
+    assert session["updated_at"] == "2026-09-08T13:42:47.816Z"
+    assert session["source"] == "v3"
+    assert session["msg_count"] == 2  # only user/assistant lines counted, not tool_call
+    assert session["credits_used"] == 1.5
+    assert session["messages_path"] == str(session_dir / "messages.jsonl")
+
+
+def test_load_one_v3_session_returns_none_for_invalid_json(tmp_path: Path) -> None:
+    """A corrupt session.json is skipped rather than raising."""
+    bad_file = tmp_path / "session.json"
+    bad_file.write_text("{not valid json")
+    assert _load_one_v3_session(bad_file) is None
+
+
+def test_extract_messages_v3_roundtrip(tmp_path: Path) -> None:
+    """extract_messages reads a CLI 3.0 messages.jsonl, skipping non-user/assistant lines."""
+    session_dir = _write_v3_session(tmp_path)
+    session = _load_one_v3_session(session_dir / "session.json")
+    assert extract_messages(session) == [
+        {"role": "you", "text": "hello there"},
+        {"role": "kiro", "text": "hi, how can I help?"},
+    ]
+
+
+def test_load_one_v3_session_no_usage_data_returns_none(tmp_path: Path) -> None:
+    """Sessions with no usage_summary lines report credits_used as None, not 0.0."""
+    session_dir = tmp_path / "workspacehash" / "sess_no_usage"
+    session_dir.mkdir(parents=True)
+    (session_dir / "session.json").write_text(
+        json.dumps(
+            {
+                "id": "sess_no_usage",
+                "title": "No usage data",
+                "workspacePaths": ["/repo/b"],
+                "createdAt": "2026-09-08T13:19:33.360Z",
+                "lastModifiedAt": "2026-09-08T13:42:47.816Z",
+            }
+        )
+    )
+    (session_dir / "messages.jsonl").write_text(
+        json.dumps({"payload": {"type": "user", "content": "hi"}}) + "\n"
+    )
+    session = _load_one_v3_session(session_dir / "session.json")
+    assert session is not None
+    assert session["credits_used"] is None
