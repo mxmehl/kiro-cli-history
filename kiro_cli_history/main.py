@@ -1,10 +1,12 @@
 """kiro-history: Fuzzy-search and browse Kiro CLI conversation history.
 
 A terminal UI for searching, browsing, and resuming Kiro CLI sessions.
-Reads from three stores (all read-only, never modifies session data):
-  1. ~/.kiro/sessions/cli/*.json+jsonl (v3: JSONL format, used by --classic mode)
-  2. <platform data dir>/kiro-cli/data.sqlite3 conversations_v2 (v2: SQLite, new TUI mode)
-  3. <platform data dir>/kiro-cli/data.sqlite3 conversations (v1: SQLite, legacy)
+Reads from four stores (all read-only, never modifies session data):
+  1. ~/.kiro/sessions/<workspace-hash>/sess_*/session.json+messages.jsonl
+     (CLI 3.0 format, current)
+  2. ~/.kiro/sessions/cli/*.json+jsonl (CLI 2.x format, used by --classic mode)
+  3. <platform data dir>/kiro-cli/data.sqlite3 conversations_v2 (CLI 2.x, new TUI mode)
+  4. <platform data dir>/kiro-cli/data.sqlite3 conversations (CLI 1.x, legacy)
 
 The SQLite data dir follows Kiro CLI's own convention: `~/Library/Application Support/kiro-cli`
 on macOS, `~/.local/share/kiro-cli` on Linux, `%APPDATA%/kiro-cli` on Windows.
@@ -20,6 +22,7 @@ import os
 import shutil
 import sqlite3
 import subprocess
+from collections.abc import Callable
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import ClassVar
@@ -241,7 +244,7 @@ def _compute_duration_min(created: str, updated: str) -> int:
 
 
 def _extract_credits_used(meta: dict) -> float | None:
-    """Sum metering_usage credit values across all turns in a v3 session's metadata.
+    """Sum metering_usage credit values across all turns in a CLI 2.x session's metadata.
 
     Returns None if the session has no usage metadata at all (rather than 0.0),
     so callers can distinguish "no data" from "genuinely free".
@@ -261,7 +264,10 @@ def _extract_credits_used(meta: dict) -> float | None:
 
 
 def _load_one_jsonl_session(json_file: Path) -> dict | None:
-    """Load a single v3 session from its .json metadata file, or None if invalid."""
+    """Load a single CLI 2.x classic-mode session from its .json metadata file.
+
+    Returns None if the file is invalid or too large.
+    """
     if json_file.stat().st_size > MAX_FILE_SIZE:
         return None
     try:
@@ -288,27 +294,106 @@ def _load_one_jsonl_session(json_file: Path) -> dict | None:
 
 
 def _load_jsonl_sessions() -> list[dict]:
-    """Load sessions from ~/.kiro/sessions/cli/*.json (v3: current format)."""
+    """Load sessions from ~/.kiro/sessions/cli/*.json (CLI 2.x classic-mode format)."""
     if not SESSIONS_DIR.exists():
         return []
     return list(filter(None, (_load_one_jsonl_session(f) for f in SESSIONS_DIR.glob("*.json"))))
 
 
+def _scan_v3_messages_file(messages_path: Path) -> tuple[int, float | None]:
+    """Scan a CLI 3.0 messages.jsonl file once for message count and total credits used.
+
+    Returns (msg_count, credits_used). credits_used is None if no usage_summary
+    lines were found at all, distinguishing "no data" from "genuinely free".
+    """
+    if not messages_path.exists():
+        return 0, None
+    msg_count = 0
+    total_credits = 0.0
+    found_usage = False
+    with messages_path.open() as jf:
+        for line in jf:
+            try:
+                ld = json.loads(line)
+            except (json.JSONDecodeError, ValueError):
+                continue
+            payload = ld.get("payload", {})
+            msg_type = payload.get("type")
+            if msg_type in ("user", "assistant"):
+                msg_count += 1
+            elif msg_type == "usage_summary":
+                for turn in payload.get("promptTurnSummaries") or []:
+                    if turn.get("unit") == "credit":
+                        total_credits += turn.get("usage", 0.0)
+                        found_usage = True
+    return msg_count, (total_credits if found_usage else None)
+
+
+def _load_one_v3_session(session_json: Path) -> dict | None:
+    """Load a single CLI 3.0 session from its session.json metadata file.
+
+    Returns None if the file is invalid or too large.
+    """
+    if session_json.stat().st_size > MAX_FILE_SIZE:
+        return None
+    try:
+        with session_json.open() as f:
+            meta = json.load(f)
+    except (json.JSONDecodeError, ValueError, OSError):
+        return None
+
+    created = meta.get("createdAt") or ""
+    updated = meta.get("lastModifiedAt") or ""
+    workspace_paths = meta.get("workspacePaths") or []
+    messages_path = session_json.with_name("messages.jsonl")
+    msg_count, credits_used = _scan_v3_messages_file(messages_path)
+    return {
+        "session_id": meta.get("id", ""),
+        "title": meta.get("title") or "(untitled)",
+        "cwd": workspace_paths[0] if workspace_paths else "",
+        "created_at": created,
+        "updated_at": updated,
+        "source": "v3",
+        "msg_count": msg_count,
+        "duration_min": _compute_duration_min(created, updated),
+        "messages_path": str(messages_path),
+        "credits_used": credits_used,
+    }
+
+
+def _load_v3_sessions() -> list[dict]:
+    """Load sessions from ~/.kiro/sessions/<workspace-hash>/sess_*/session.json (CLI 3.0 format)."""
+    root = SESSIONS_DIR.parent
+    if not root.exists():
+        return []
+    return list(
+        filter(
+            None,
+            (_load_one_v3_session(f) for f in root.glob("*/sess_*/session.json")),
+        )
+    )
+
+
 def get_sessions() -> list[dict]:
     """Load all sessions from all stores, deduplicated, sorted by recency."""
+    v3 = _load_v3_sessions()
     jsonl = _load_jsonl_sessions()
     sqlite = _load_sqlite_sessions()
 
-    # Deduplicate: if same session_id exists in both, prefer JSONL (newer format)
-    seen_ids = {s["session_id"] for s in jsonl if s["session_id"]}
+    # Deduplicate: prefer v3 (CLI 3.0) over jsonl (CLI 2.x) over sqlite (oldest)
+    seen_ids = {s["session_id"] for s in v3 if s["session_id"]}
+    for s in jsonl:
+        if s["session_id"] and s["session_id"] not in seen_ids:
+            v3.append(s)
+            seen_ids.add(s["session_id"])
     for s in sqlite:
         if s["session_id"] and s["session_id"] not in seen_ids:
-            jsonl.append(s)
+            v3.append(s)
             seen_ids.add(s["session_id"])
 
     # Sort: sessions with timestamps first (descending), then untimed ones at the end
-    jsonl.sort(key=lambda s: s.get("updated_at") or s.get("created_at") or "0", reverse=True)
-    return jsonl
+    v3.sort(key=lambda s: s.get("updated_at") or s.get("created_at") or "0", reverse=True)
+    return v3
 
 
 def _text_block_from_content(content: object) -> str:
@@ -321,7 +406,7 @@ def _text_block_from_content(content: object) -> str:
 
 
 def _parse_jsonl_message_line(line: str) -> dict[str, str] | None:
-    """Parse one JSONL line into a {role, text} message, or None if not applicable."""
+    """Parse one CLI 2.x JSONL line into a {role, text} message, or None if not applicable."""
     try:
         d = json.loads(line)
     except (json.JSONDecodeError, ValueError):
@@ -335,17 +420,28 @@ def _parse_jsonl_message_line(line: str) -> dict[str, str] | None:
     return {"role": "you" if kind == "Prompt" else "kiro", "text": txt}
 
 
-def extract_messages(session: dict, limit: int | None = None) -> list[dict[str, str]]:
-    """Extract conversation messages from any session format."""
-    # SQLite sessions carry _history inline
-    if "_history" in session:
-        return _extract_messages_from_history(session["_history"], limit)
+def _parse_v3_message_line(line: str) -> dict[str, str] | None:
+    """Parse one CLI 3.0 messages.jsonl line into a {role, text} message, or None."""
+    try:
+        d = json.loads(line)
+    except (json.JSONDecodeError, ValueError):
+        return None
+    payload = d.get("payload", {})
+    msg_type = payload.get("type", "")
+    if msg_type not in ("user", "assistant"):
+        return None
+    txt = payload.get("content", "")
+    if not isinstance(txt, str) or not txt:
+        return None
+    return {"role": "you" if msg_type == "user" else "kiro", "text": txt}
 
-    # JSONL sessions read from file
-    jsonl_path = session.get("jsonl_path", "")
-    if not jsonl_path:
-        return []
-    path = Path(jsonl_path)
+
+def _extract_messages_from_file(
+    path: Path,
+    parser: Callable[[str], dict[str, str] | None],
+    limit: int | None,
+) -> list[dict[str, str]]:
+    """Read a JSONL-style file and parse each line with the given per-format parser."""
     if not path.exists() or path.stat().st_size == 0:
         return []
     if path.stat().st_size > MAX_FILE_SIZE:
@@ -354,12 +450,30 @@ def extract_messages(session: dict, limit: int | None = None) -> list[dict[str, 
     messages = []
     with path.open() as f:
         for line in f:
-            message = _parse_jsonl_message_line(line)
+            message = parser(line)
             if message:
                 messages.append(message)
                 if limit and len(messages) >= limit:
                     break
     return messages
+
+
+def extract_messages(session: dict, limit: int | None = None) -> list[dict[str, str]]:
+    """Extract conversation messages from any session format."""
+    # SQLite sessions carry _history inline
+    if "_history" in session:
+        return _extract_messages_from_history(session["_history"], limit)
+
+    # CLI 3.0 sessions read from messages.jsonl
+    messages_path = session.get("messages_path", "")
+    if messages_path:
+        return _extract_messages_from_file(Path(messages_path), _parse_v3_message_line, limit)
+
+    # CLI 2.x classic-mode sessions read from <uuid>.jsonl
+    jsonl_path = session.get("jsonl_path", "")
+    if not jsonl_path:
+        return []
+    return _extract_messages_from_file(Path(jsonl_path), _parse_jsonl_message_line, limit)
 
 
 def _fuzzy_match(query: str, text: str) -> bool:
