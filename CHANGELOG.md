@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/mxmehl/kiro-cli-history/compare/v0.4.0...v0.4.1) (2026-09-12)
+
+
+### ⚙️ Chores
+
+* **deps:** update zizmorcore/zizmor-action action to v0.6.4 ([#35](https://github.com/mxmehl/kiro-cli-history/issues/35)) ([7ae7d18](https://github.com/mxmehl/kiro-cli-history/commit/7ae7d180667d97b09ff10f760ae889f3c5f4ddf3))
+
 ## [0.4.0](https://github.com/mxmehl/kiro-cli-history/compare/v0.3.2...v0.4.0) (2026-09-08)
 
 
