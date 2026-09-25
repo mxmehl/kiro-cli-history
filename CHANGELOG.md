@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.1](https://github.com/mxmehl/kiro-cli-history/compare/v0.4.0...v0.4.1) (2026-09-25)
+
+
+### ⚙️ Chores
+
+* **deps:** lock file maintenance ([#38](https://github.com/mxmehl/kiro-cli-history/issues/38)) ([b1e10d4](https://github.com/mxmehl/kiro-cli-history/commit/b1e10d4414af67c969f53672e8d8200a9558adc0))
+* **deps:** lock file maintenance ([#40](https://github.com/mxmehl/kiro-cli-history/issues/40)) ([27b4a00](https://github.com/mxmehl/kiro-cli-history/commit/27b4a0023878f8c52181de44c44f155c8df81a66))
+* **deps:** update astral-sh/setup-uv action to v10.1.0 ([#37](https://github.com/mxmehl/kiro-cli-history/issues/37)) ([527c2fb](https://github.com/mxmehl/kiro-cli-history/commit/527c2fb4b3414f6c92c9483dbd5e5f909f964355))
+* **deps:** update astral-sh/setup-uv action to v10.2.0 ([#41](https://github.com/mxmehl/kiro-cli-history/issues/41)) ([9c52301](https://github.com/mxmehl/kiro-cli-history/commit/9c5230144c0d6dc9ffb09320b1485dd20ebdf2fd))
+* **deps:** update dependency ubuntu to v26 ([#39](https://github.com/mxmehl/kiro-cli-history/issues/39)) ([a7d1ac4](https://github.com/mxmehl/kiro-cli-history/commit/a7d1ac47c425bed54986c5f7752768baa495519d))
+* **deps:** update zizmorcore/zizmor-action action to v0.6.4 ([#35](https://github.com/mxmehl/kiro-cli-history/issues/35)) ([7ae7d18](https://github.com/mxmehl/kiro-cli-history/commit/7ae7d180667d97b09ff10f760ae889f3c5f4ddf3))
+
 ## [0.4.0](https://github.com/mxmehl/kiro-cli-history/compare/v0.3.2...v0.4.0) (2026-09-08)
 
 
