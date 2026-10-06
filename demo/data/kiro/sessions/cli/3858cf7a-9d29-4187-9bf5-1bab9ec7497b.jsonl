@@ -1,0 +1,6 @@
+{"version": "v1", "kind": "Prompt", "data": {"message_id": "2a02bb69-4299-46ff-b52d-36b102436f03", "content": [{"kind": "text", "data": "We want to migrate self-managed PostgreSQL on EC2 to Aurora Serverless v2."}]}}
+{"version": "v1", "kind": "AssistantMessage", "data": {"message_id": "755f35c2-ca53-4a3d-88f0-376aba7a697e", "content": [{"kind": "text", "data": "Good choice. I'll use DMS for continuous replication, then validate and switch over during a maintenance window."}]}}
+{"version": "v1", "kind": "Prompt", "data": {"message_id": "f9dcf858-a8c7-4f3c-a886-1596bb286ee6", "content": [{"kind": "text", "data": "We're on PostgreSQL 12. Is that a problem?"}]}}
+{"version": "v1", "kind": "AssistantMessage", "data": {"message_id": "aa122637-4d9c-41f0-9e44-af1031f888a8", "content": [{"kind": "text", "data": "Yes, PG 12 is EOL. Upgrade to PG 15 on EC2 first, then migrate."}]}}
+{"version": "v1", "kind": "Prompt", "data": {"message_id": "cb035111-f37d-4a29-9290-e22828e33ef6", "content": [{"kind": "text", "data": "What about PostGIS, pg_cron, and pgvector?"}]}}
+{"version": "v1", "kind": "AssistantMessage", "data": {"message_id": "a7affa64-c448-486e-be6f-2bddc36835c0", "content": [{"kind": "text", "data": "All three are supported on Aurora PG 15 \u2014 no blockers there."}]}}

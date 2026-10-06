@@ -21,6 +21,7 @@ Kiro CLI has great built-in [conversation persistence](https://kiro.dev/docs/cli
 - **Global search** — find conversations across all directories, not just the current one
 - **Full-text fuzzy search** — searches every message you and Kiro exchanged, not just titles
 - **Conversation preview** — read through the full exchange with markdown rendering before deciding to resume
+- **Session metadata** — see the working directory, last activity date, message count, duration - including total credit usage!
 - **One-key resume** — press `Ctrl+R` to jump into Kiro CLI and continue the conversation
 - **Copy to clipboard** — press `Ctrl+Y` to copy an entire conversation
 - **All session formats** — reads all four Kiro CLI storage versions (CLI 1.x SQLite, CLI 2.x SQLite, CLI 2.x classic-mode JSONL, CLI 3.0), covering both `--classic` and TUI modes across versions

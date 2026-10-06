@@ -1,0 +1,7 @@
+{"payload": {"type": "user", "content": "My React app is getting CORS errors calling my API Gateway endpoint."}}
+{"payload": {"type": "assistant", "content": "Let me check your API Gateway configuration."}}
+{"payload": {"type": "tool_call", "toolName": "tools: fs_read"}}
+{"payload": {"type": "assistant", "content": "Found it: the OPTIONS preflight method is missing CORS headers. Fixing the API Gateway resource and the Lambda response now."}}
+{"payload": {"type": "user", "content": "Why does it work in Postman but not in the browser?"}}
+{"payload": {"type": "assistant", "content": "Postman doesn't enforce CORS \u2014 it's a browser-only mechanism."}}
+{"payload": {"type": "usage_summary", "promptTurnSummaries": [{"unit": "credit", "usage": 0.6}]}}

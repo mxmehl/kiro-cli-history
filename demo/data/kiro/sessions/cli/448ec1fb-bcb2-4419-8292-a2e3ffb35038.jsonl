@@ -1,0 +1,5 @@
+{"version": "v1", "kind": "Prompt", "data": {"message_id": "0bce9bdf-170f-4ac1-ab25-282617197100", "content": [{"kind": "text", "data": "Help me write unit tests for our JWT authentication middleware."}]}}
+{"version": "v1", "kind": "AssistantMessage", "data": {"message_id": "c10374cc-bf93-40b6-b81f-afb298bd6b0a", "content": [{"kind": "text", "data": "Let me read the middleware code first."}]}}
+{"version": "v1", "kind": "AssistantMessage", "data": {"message_id": "e15ae75b-ea83-4388-89d4-e79feadf928e", "content": [{"kind": "text", "data": "I'll cover: valid token, missing token, expired token, invalid signature, wrong issuer, and the refresh token flow."}]}}
+{"version": "v1", "kind": "Prompt", "data": {"message_id": "d823485e-caeb-431b-87b4-77c5cec860e2", "content": [{"kind": "text", "data": "Use vitest instead of jest"}]}}
+{"version": "v1", "kind": "AssistantMessage", "data": {"message_id": "63682da9-f1bd-4cdb-aabd-6c064b43facf", "content": [{"kind": "text", "data": "Switched \u2014 same test structure, just different imports and config."}]}}

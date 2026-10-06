@@ -1,0 +1,7 @@
+{"payload": {"type": "user", "content": "Create a GitHub Actions workflow for our Node.js monorepo."}}
+{"payload": {"type": "assistant", "content": "I'll check what packages you have first."}}
+{"payload": {"type": "tool_call", "toolName": "tools: code"}}
+{"payload": {"type": "assistant", "content": "Found 4 packages: api, web, shared, worker. Setting up path-based triggers, parallel test jobs, and a staging deploy on merge."}}
+{"payload": {"type": "user", "content": "Can you add a preview deployment for each PR using Vercel?"}}
+{"payload": {"type": "assistant", "content": "Added \u2014 it comments the preview URL on the PR."}}
+{"payload": {"type": "usage_summary", "promptTurnSummaries": [{"unit": "credit", "usage": 1.75}]}}
