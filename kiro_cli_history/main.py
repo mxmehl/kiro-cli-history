@@ -220,7 +220,7 @@ def _count_jsonl_messages(jsonl_path: Path) -> int:
     if not jsonl_path.exists():
         return 0
     count = 0
-    with jsonl_path.open() as jf:
+    with jsonl_path.open(encoding="utf-8") as jf:
         for line in jf:
             try:
                 ld = json.loads(line)
@@ -271,7 +271,7 @@ def _load_one_jsonl_session(json_file: Path) -> dict | None:
     if json_file.stat().st_size > MAX_FILE_SIZE:
         return None
     try:
-        with json_file.open() as f:
+        with json_file.open(encoding="utf-8") as f:
             meta = json.load(f)
     except (json.JSONDecodeError, ValueError, OSError):
         return None
@@ -311,7 +311,7 @@ def _scan_v3_messages_file(messages_path: Path) -> tuple[int, float | None]:
     msg_count = 0
     total_credits = 0.0
     found_usage = False
-    with messages_path.open() as jf:
+    with messages_path.open(encoding="utf-8") as jf:
         for line in jf:
             try:
                 ld = json.loads(line)
@@ -337,7 +337,7 @@ def _load_one_v3_session(session_json: Path) -> dict | None:
     if session_json.stat().st_size > MAX_FILE_SIZE:
         return None
     try:
-        with session_json.open() as f:
+        with session_json.open(encoding="utf-8") as f:
             meta = json.load(f)
     except (json.JSONDecodeError, ValueError, OSError):
         return None
@@ -448,7 +448,7 @@ def _extract_messages_from_file(
         return [{"role": "system", "text": "(File too large to preview)"}]
 
     messages = []
-    with path.open() as f:
+    with path.open(encoding="utf-8") as f:
         for line in f:
             message = parser(line)
             if message:
