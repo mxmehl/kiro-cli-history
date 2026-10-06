@@ -125,15 +125,30 @@ Kiro CLI stores conversations in four formats depending on the version and mode:
 - **Duration** — elapsed time
 - **Credit usage** — total credits spent on the session (CLI 2.x and CLI 3.0 sessions only — SQLite sessions don't record this)
 
-## How this complements Kiro CLI
+## Comparison with alternatives
 
-Kiro CLI's native `--resume` and `--resume-picker` work well when you know which directory a session was started in. `kiro-cli-history` is a companion tool for when you need to find a conversation but don't remember where it happened — it gives you a global view with full-text search.
+Kiro CLI 2.21+ ships its own V3-only session dashboard (`/sessions` or `kiro-cli chat --sessions`), which closed much of the gap this tool originally filled: it can list sessions across all workspaces (toggle off `current workspace only`) and content-search your prompts and the agent's responses, not just titles. `--list-sessions --all-cwds` also lists sessions across directories from the shell, without the TUI.
 
-| | `--resume-picker` (native) | `kiro-cli-history` |
-|---|---|---|
-| Scope | Current directory | All directories |
-| Search | Browse by title | Full-text across all messages |
-| Preview | Title + message count | Full conversation with markdown |
+What the native dashboard still doesn't cover, as of CLI 2.27:
+
+- **Legacy formats**: it only content-indexes local V2 and V3 session transcripts. CLI 1.x SQLite sessions, classic-mode JSONL sessions, and cloud sessions are matched by title/workspace/ID/tag only — their message content isn't searchable
+- **Tool output**: never indexed in either native mode
+- **Markdown-rendered preview**: the native dashboard has no preview pane at all — you browse a list and press Enter to resume; there's no way to see conversation content before committing
+- **Clipboard export**: no equivalent to copying a full conversation to the clipboard
+- **Credit usage per session**: not shown in the dashboard
+- **V1/V2 harness support**: `/sessions` is V3-only; it's unavailable if you run the legacy terminal UI or classic mode
+
+| | `/sessions` dashboard (native, V3) | `--list-sessions --all-cwds` (native) | `kiro-cli-history` |
+|---|---|---|---|
+| Scope | All workspaces (toggle) | All directories | All directories |
+| Content search | Prompts + responses, local V2/V3 only | None (metadata only) | Full-text, all four storage formats |
+| Legacy format support (CLI 1.x, classic JSONL) | Metadata only, no content search | Yes, listing only | Yes, including content search |
+| Preview | None (list only, resume to see content) | Session list (JSON/plain) | Rendered markdown conversation |
+| Clipboard copy | No | No | Yes (`Ctrl+Y`) |
+| Credit usage | No | No | Yes (CLI 2.x/3.0 sessions) |
+| Requires V3 | Yes | No | No |
+
+If you're on V3 and mainly care about recent sessions, the native dashboard now covers some day-to-day uses. `kiro-cli-history` remains useful if you're interested in having a credits overview, need to search old CLI 1.x/classic sessions, want a readable markdown preview before resuming, or use V1/V2 harness modes where `/sessions` doesn't exist.
 
 ## Platform
 
