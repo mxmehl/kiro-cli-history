@@ -27,6 +27,48 @@ from tests.fixtures import (
 )
 
 
+def test_jsonl_session_with_non_utf8_safe_bytes_loads_correctly(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Classic-mode .json/.jsonl reads must always use UTF-8, regardless of platform locale.
+
+    Regression test for a real-world bug: Kiro CLI always writes session files as UTF-8,
+    but on Windows, Path.open() without encoding="utf-8" falls back to the system codepage
+    (e.g. cp1252), which cannot decode many valid UTF-8 byte sequences (umlauts, em dashes,
+    curly quotes seen in real session exports). This writes a session containing such bytes
+    and confirms it loads correctly. It also asserts the five file reads in main.py request
+    encoding="utf-8" explicitly, so the bug can't silently resurface on a platform where the
+    default encoding happens to match UTF-8 (e.g. macOS/Linux, where this test would
+    otherwise pass even without the fix).
+    """
+    jsonl_root = tmp_path / "cli"
+    title = "Ümlaut café — \u201equote\u201c"
+    write_jsonl_session(
+        jsonl_root,
+        title=title,
+        cwd="/home/user/na\u00efve",
+        messages=[("you", "Kennst du foobarwhatever?"), ("kiro", "Nein — sagt mir nichts.")],
+        days_ago=1,
+        duration_min=5,
+    )
+    monkeypatch.setattr(main_module, "SESSIONS_DIR", jsonl_root)
+
+    sessions = main_module._load_jsonl_sessions()  # noqa: SLF001
+
+    assert len(sessions) == 1
+    assert sessions[0]["title"] == title
+    assert sessions[0]["msg_count"] == 2
+
+    # Structural guard: every Path.open() call in main.py must pin encoding="utf-8",
+    # since the runtime failure above can't be reproduced on platforms (macOS/Linux)
+    # whose default encoding is already UTF-8.
+    source = Path(main_module.__file__).read_text(encoding="utf-8")
+    open_calls = [line for line in source.splitlines() if ".open(" in line and "Path" not in line]
+    assert open_calls, "expected at least one .open() call in main.py"
+    for line in open_calls:
+        assert 'encoding="utf-8"' in line, f"missing encoding='utf-8' in: {line.strip()}"
+
+
 def test_fuzzy_match_tokens_any_order() -> None:
     """All query tokens must appear, order-independent, substrings allowed."""
     assert _fuzzy_match("mem leak", text="Debug memory leak in worker")
