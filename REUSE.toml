@@ -8,6 +8,7 @@ path = [
   "renovate.json5",
   "uv.lock",
   ".gitignore",
+  "mise.lock",
 ]
 SPDX-FileCopyrightText = "2026 Max Mehl <https://mehl.mx>"
 SPDX-License-Identifier = "CC0-1.0"
