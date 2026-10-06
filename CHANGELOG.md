@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.2](https://github.com/mxmehl/kiro-cli-history/compare/v0.4.1...v0.4.2) (2026-10-06)
+
+
+### ⚙️ Chores
+
+* pin tool versions to minor granularity in mise ([#48](https://github.com/mxmehl/kiro-cli-history/issues/48)) ([0d4555a](https://github.com/mxmehl/kiro-cli-history/commit/0d4555a05d27729dda9acf32257fb54533d4ab5f))
+
 ## [0.4.1](https://github.com/mxmehl/kiro-cli-history/compare/v0.4.0...v0.4.1) (2026-10-06)
 
 
