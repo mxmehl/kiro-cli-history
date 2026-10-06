@@ -236,7 +236,7 @@ wheels = [
 
 [[package]]
 name = "kiro-cli-history"
-version = "0.4.1"
+version = "0.4.2"
 source = { editable = "." }
 default-groups = "all"
 dependencies = [
