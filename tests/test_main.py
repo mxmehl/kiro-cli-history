@@ -19,6 +19,12 @@ from kiro_cli_history.main import (
     extract_messages,
     search_sessions,
 )
+from tests.fixtures import (
+    SAMPLE_SESSIONS,
+    write_jsonl_session,
+    write_sqlite_v2_sessions,
+    write_v3_session,
+)
 
 
 def test_fuzzy_match_tokens_any_order() -> None:
@@ -249,3 +255,43 @@ def test_load_one_v3_session_no_usage_data_returns_none(tmp_path: Path) -> None:
     session = _load_one_v3_session(session_dir / "session.json")
     assert session is not None
     assert session["credits_used"] is None
+
+
+def test_get_sessions_reads_all_formats_from_shared_demo_data(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """get_sessions() finds every session written in the v3, classic, and sqlite formats.
+
+    Uses the same sample data as demo/generate_demo_data.py (tests/fixtures.py) so the
+    demo dataset doubles as an integration fixture for the three on-disk formats.
+    """
+    v3_root = tmp_path / "kiro" / "sessions"
+    jsonl_root = v3_root / "cli"
+    sqlite_path = tmp_path / "kiro-cli" / "data.sqlite3"
+
+    v3_sessions = SAMPLE_SESSIONS[:2]
+    jsonl_sessions = SAMPLE_SESSIONS[2:4]
+    sqlite_sessions = SAMPLE_SESSIONS[4:6]
+
+    for title, cwd, messages, days_ago, duration_min in v3_sessions:
+        write_v3_session(v3_root, title, cwd, messages, days_ago, duration_min)
+    for title, cwd, messages, days_ago, duration_min in jsonl_sessions:
+        write_jsonl_session(jsonl_root, title, cwd, messages, days_ago, duration_min)
+    write_sqlite_v2_sessions(sqlite_path, sqlite_sessions)
+
+    # SESSIONS_DIR doubles as the classic-mode root and (via .parent) the v3 root.
+    monkeypatch.setattr(main_module, "SESSIONS_DIR", jsonl_root)
+    monkeypatch.setattr(main_module, "SQLITE_DB", sqlite_path)
+
+    sessions = main_module.get_sessions()
+    titles = {s["title"] for s in sessions}
+    sources = {s["source"] for s in sessions}
+
+    assert len(sessions) == 6
+    assert sources == {"v3", "jsonl", "sqlite_v2"}
+    for title, *_ in v3_sessions + jsonl_sessions:
+        assert title in titles
+    # sqlite_v2 sessions have no title field; they fall back to the first prompt,
+    # truncated to 60 chars (see _get_first_prompt_from_history).
+    for _, _, messages, _, _ in sqlite_sessions:
+        assert messages[0][1][:60] in titles

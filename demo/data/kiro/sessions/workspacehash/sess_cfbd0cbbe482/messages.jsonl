@@ -1,0 +1,7 @@
+{"payload": {"type": "user", "content": "I have a FastAPI app that I want to deploy to ECS Fargate."}}
+{"payload": {"type": "assistant", "content": "Sure! Let me look at your project structure first."}}
+{"payload": {"type": "tool_call", "toolName": "tools: fs_read"}}
+{"payload": {"type": "assistant", "content": "I can see your FastAPI app with a Dockerfile. Let me create the ECS task definition, service, and ALB configuration."}}
+{"payload": {"type": "user", "content": "Sounds good. Also add a CloudWatch dashboard for monitoring."}}
+{"payload": {"type": "assistant", "content": "I'll add CloudWatch alarms for CPU, memory, and 5xx errors."}}
+{"payload": {"type": "usage_summary", "promptTurnSummaries": [{"unit": "credit", "usage": 1.25}]}}

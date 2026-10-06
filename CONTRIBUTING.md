@@ -31,6 +31,31 @@ This creates a virtual environment in `.venv/` and installs all runtime and deve
 uv run kiro-cli-history
 ```
 
+## Demo data and recording the README GIF
+
+`demo/generate_demo_data.py` writes synthetic sessions in all three on-disk formats the app reads (CLI 3.0, CLI 2.x classic JSONL, and CLI 2.x SQLite) to `demo/data/`, using the same sample conversations as the test suite (`tests/fixtures.py`). This keeps the demo data and the integration test fixtures in sync.
+
+Regenerate the demo data:
+
+```sh
+uv run python demo/generate_demo_data.py
+```
+
+Run the app against it without touching your real session data:
+
+```sh
+KIRO_DEMO_DIR=demo/data uv run kiro-cli-history
+```
+
+The README's `meta/demo.gif` is recorded with [VHS](https://github.com/charmbracelet/vhs) from the scripted tape at `demo/demo.tape`. Install VHS, then from the repo root:
+
+```sh
+uv run python demo/generate_demo_data.py
+vhs demo/demo.tape
+```
+
+This regenerates `meta/demo.gif` in place. Edit `demo/demo.tape` to change the recorded sequence (keystrokes, pacing, terminal size).
+
 ## Quality checks
 
 The project uses the following tools for code quality:
