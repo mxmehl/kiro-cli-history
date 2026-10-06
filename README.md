@@ -153,7 +153,7 @@ If you're on V3 and mainly care about recent sessions, the native dashboard now 
 ## Platform
 
 Session discovery and clipboard support now work across macOS, Linux, and Windows:
-- **Session storage** — resolved via the same platform-specific data directory convention Kiro CLI itself uses (`~/Library/Application Support/`, `~/.local/share/`, or `%APPDATA%`)
+- **Session storage** — CLI 3.0 and classic JSONL sessions always live under `~/.kiro/sessions/` (same path on every platform); the CLI 2.x/1.x SQLite database is resolved via the platform-specific data directory convention Kiro CLI itself uses (`~/Library/Application Support/`, `~/.local/share/`, or `%APPDATA%`)
 - **Clipboard** — tries `pbcopy` (macOS), `clip` (Windows), then `wl-copy`, `xclip`, or `xsel` (Linux, Wayland/X11)
 
 This has been tested on macOS and Windows. Linux support is implemented but not yet verified in practice — bug reports and PRs are welcome if something doesn't work as expected.
