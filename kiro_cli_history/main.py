@@ -617,7 +617,7 @@ class KiroHistory(App):
     }
     """
 
-    BINDINGS: ClassVar[list[Binding]] = [
+    BINDINGS: ClassVar[list[Binding | tuple[str, str] | tuple[str, str, str]]] = [
         Binding("ctrl+r", "resume", "Resume session"),
         Binding("ctrl+y", "copy_conversation", "Copy to clipboard"),
         Binding("ctrl+f", "search_content", "Search in conversation"),
