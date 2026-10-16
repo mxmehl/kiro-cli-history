@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.2](https://github.com/mxmehl/kiro-cli-history/compare/v0.4.1...v0.4.2) (2026-10-16)
+
+
+### ⚙️ Chores
+
+* **deps:** lock file maintenance ([#51](https://github.com/mxmehl/kiro-cli-history/issues/51)) ([6468d3e](https://github.com/mxmehl/kiro-cli-history/commit/6468d3e21be828863f5502541ecaee1d2f27bae0))
+* **deps:** update actions/create-github-app-token action to v3.3.0 ([#55](https://github.com/mxmehl/kiro-cli-history/issues/55)) ([84eb4ad](https://github.com/mxmehl/kiro-cli-history/commit/84eb4ad5c63f51809f3c2e39e0bff3981b221c1d))
+* **deps:** update astral-sh/setup-uv action to v10.3.0 ([#52](https://github.com/mxmehl/kiro-cli-history/issues/52)) ([87bcfb5](https://github.com/mxmehl/kiro-cli-history/commit/87bcfb5f27c962ba22c8eb3f610adb639debe57f))
+* **deps:** update dependency python to 3.15 ([#54](https://github.com/mxmehl/kiro-cli-history/issues/54)) ([1287b25](https://github.com/mxmehl/kiro-cli-history/commit/1287b25168a0184ee30642d24ecf1bb308ac167a))
+* **deps:** update dependency uv_build to &gt;=0.13.0,&lt;0.14.0 ([#53](https://github.com/mxmehl/kiro-cli-history/issues/53)) ([bf3d21f](https://github.com/mxmehl/kiro-cli-history/commit/bf3d21f9c894c173832852e1a7a10a589ec690bc))
+* pin tool versions to minor granularity in mise ([#48](https://github.com/mxmehl/kiro-cli-history/issues/48)) ([0d4555a](https://github.com/mxmehl/kiro-cli-history/commit/0d4555a05d27729dda9acf32257fb54533d4ab5f))
+
 ## [0.4.1](https://github.com/mxmehl/kiro-cli-history/compare/v0.4.0...v0.4.1) (2026-10-06)
 
 
