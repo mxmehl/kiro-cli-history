@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.4.2](https://github.com/mxmehl/kiro-cli-history/compare/v0.4.1...v0.4.2) (2026-10-26)
+
+
+### ⚙️ Chores
+
+* **deps:** lock file maintenance ([#51](https://github.com/mxmehl/kiro-cli-history/issues/51)) ([6468d3e](https://github.com/mxmehl/kiro-cli-history/commit/6468d3e21be828863f5502541ecaee1d2f27bae0))
+* **deps:** lock file maintenance ([#58](https://github.com/mxmehl/kiro-cli-history/issues/58)) ([7b20f37](https://github.com/mxmehl/kiro-cli-history/commit/7b20f37105df6cc0926a504682732da18765b576))
+* **deps:** lock file maintenance ([#61](https://github.com/mxmehl/kiro-cli-history/issues/61)) ([a13650a](https://github.com/mxmehl/kiro-cli-history/commit/a13650aee5597ee5bb6291cdd1e00957f6a34347))
+* **deps:** update actions/create-github-app-token action to v3.3.0 ([#55](https://github.com/mxmehl/kiro-cli-history/issues/55)) ([84eb4ad](https://github.com/mxmehl/kiro-cli-history/commit/84eb4ad5c63f51809f3c2e39e0bff3981b221c1d))
+* **deps:** update astral-sh/setup-uv action to v10.3.0 ([#52](https://github.com/mxmehl/kiro-cli-history/issues/52)) ([87bcfb5](https://github.com/mxmehl/kiro-cli-history/commit/87bcfb5f27c962ba22c8eb3f610adb639debe57f))
+* **deps:** update dependency python to 3.15 ([#54](https://github.com/mxmehl/kiro-cli-history/issues/54)) ([1287b25](https://github.com/mxmehl/kiro-cli-history/commit/1287b25168a0184ee30642d24ecf1bb308ac167a))
+* **deps:** update dependency uv_build to &gt;=0.13.0,&lt;0.14.0 ([#53](https://github.com/mxmehl/kiro-cli-history/issues/53)) ([bf3d21f](https://github.com/mxmehl/kiro-cli-history/commit/bf3d21f9c894c173832852e1a7a10a589ec690bc))
+* **deps:** update github actions group ([#60](https://github.com/mxmehl/kiro-cli-history/issues/60)) ([fd146f7](https://github.com/mxmehl/kiro-cli-history/commit/fd146f712461bbfd1d2d793327d22fc8b3817b76))
+* **deps:** update pypa/gh-action-pypi-publish action to v1.14.3 ([#59](https://github.com/mxmehl/kiro-cli-history/issues/59)) ([d3abda1](https://github.com/mxmehl/kiro-cli-history/commit/d3abda1df3cdf162d329d1ea6c11bb6f0356e281))
+* **deps:** update zizmorcore/zizmor-action action to v0.7.0 ([#56](https://github.com/mxmehl/kiro-cli-history/issues/56)) ([4c60456](https://github.com/mxmehl/kiro-cli-history/commit/4c60456744c2339b8be6230f55bcbefd7ded3f49))
+* **deps:** update zizmorcore/zizmor-action action to v0.7.1 ([#57](https://github.com/mxmehl/kiro-cli-history/issues/57)) ([99ea665](https://github.com/mxmehl/kiro-cli-history/commit/99ea665c4a59b9d8869170bd4d69d8de54beea42))
+* **deps:** update zizmorcore/zizmor-action action to v0.8.0 ([#62](https://github.com/mxmehl/kiro-cli-history/issues/62)) ([248018d](https://github.com/mxmehl/kiro-cli-history/commit/248018da0b635c1045514a863d4ce50656447680))
+* pin tool versions to minor granularity in mise ([#48](https://github.com/mxmehl/kiro-cli-history/issues/48)) ([0d4555a](https://github.com/mxmehl/kiro-cli-history/commit/0d4555a05d27729dda9acf32257fb54533d4ab5f))
+
 ## [0.4.1](https://github.com/mxmehl/kiro-cli-history/compare/v0.4.0...v0.4.1) (2026-10-06)
 
 
