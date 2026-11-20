@@ -35,7 +35,7 @@ This tool **never writes to or modifies** your Kiro CLI session data. It only re
 
 ## Install
 
-Requires at least Python 3.10.
+Requires at least Python 3.11.
 
 With [pipx](https://pipx.pypa.io/):
 
