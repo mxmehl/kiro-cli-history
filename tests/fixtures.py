@@ -12,7 +12,7 @@ GIF, so the two stay in sync automatically.
 import json
 import sqlite3
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 # Each entry: (title, cwd, [(role, text), ...], days_ago, duration_min)
@@ -224,7 +224,7 @@ SAMPLE_SESSIONS: list[tuple[str, str, list[tuple[str, str]], int, int]] = [
 
 def _now() -> datetime:
     """Return the current UTC time, as a single call site for easier testing."""
-    return datetime.now(tz=timezone.utc)
+    return datetime.now(tz=UTC)
 
 
 def write_v3_session(

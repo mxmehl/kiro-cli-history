@@ -23,7 +23,7 @@ import shutil
 import sqlite3
 import subprocess
 from collections.abc import Callable
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import ClassVar
 
@@ -138,12 +138,8 @@ def _parse_v2_row(
     except (json.JSONDecodeError, ValueError):
         return None
     history = d.get("history", [])
-    created = datetime.fromtimestamp(created_ms / 1000, tz=timezone.utc).strftime(
-        "%Y-%m-%dT%H:%M:%S"
-    )
-    updated = datetime.fromtimestamp(updated_ms / 1000, tz=timezone.utc).strftime(
-        "%Y-%m-%dT%H:%M:%S"
-    )
+    created = datetime.fromtimestamp(created_ms / 1000, tz=UTC).strftime("%Y-%m-%dT%H:%M:%S")
+    updated = datetime.fromtimestamp(updated_ms / 1000, tz=UTC).strftime("%Y-%m-%dT%H:%M:%S")
     return {
         "session_id": conv_id,
         "title": _get_first_prompt_from_history(history),
@@ -236,8 +232,8 @@ def _compute_duration_min(created: str, updated: str) -> int:
     if not (created and updated):
         return 0
     try:
-        c = datetime.fromisoformat(created.replace("Z", "+00:00"))
-        u = datetime.fromisoformat(updated.replace("Z", "+00:00"))
+        c = datetime.fromisoformat(created)
+        u = datetime.fromisoformat(updated)
     except (ValueError, TypeError):
         return 0
     return int((u - c).total_seconds() / 60)
@@ -526,7 +522,7 @@ class SessionItem(ListItem):
         """Render the row's title, directory, timestamp, message count, and duration."""
         raw_ts = (self.session.get("updated_at") or "")[:10]
         try:
-            dt = datetime.strptime(raw_ts, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+            dt = datetime.strptime(raw_ts, "%Y-%m-%d").replace(tzinfo=UTC)
             ts = dt.strftime("%-d %b %Y")
         except (ValueError, TypeError):
             ts = raw_ts
